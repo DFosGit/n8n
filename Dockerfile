@@ -1,31 +1,55 @@
-FROM n8nio/n8n:1.81.0
+FROM node:20-slim
 
-# Переключаемся на пользователя root для установки пакетов
-USER root
+# Установка Python и других зависимостей
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libgbm1 \
+    libasound2 \
+    libpangocairo-1.0-0 \
+    libxss1 \
+    libgtk-3-0 \
+    libxshmfence1 \
+    libglu1-mesa \
+    sudo \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем Python и pip
-RUN if command -v apt-get >/dev/null 2>&1; then \
-        apt-get update && \
-        apt-get install -y --no-install-recommends python3 python3-pip && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*; \
-    elif command -v apk >/dev/null 2>&1; then \
-        apk add --no-cache python3 py3-pip; \
-    fi
+# Установка правильной версии pnpm
+RUN npm install -g pnpm@10.2.1
 
-# Копирование вашего существующего requirements.txt
-COPY requirements.txt /tmp/requirements.txt
+WORKDIR /app
 
-# Установка Python-зависимостей
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+# Копируем все файлы проекта
+COPY . .
 
-# Определяем путь к сайт-пакетам Python
-RUN python3 -c "import site; import os; print(site.getsitepackages()[0])" > /tmp/python_path && \
-    PYTHON_SITE_PACKAGES=$(cat /tmp/python_path) && \
-    echo "PYTHONPATH=${PYTHON_SITE_PACKAGES}" >> /etc/environment
+# Установка node зависимостей
+RUN pnpm install --ignore-scripts
 
-# Настройка PYTHONPATH для доступа к пакетам Python из n8n
-ENV PYTHONPATH=/usr/local/lib/python3.10/site-packages:/usr/lib/python3/dist-packages:/usr/lib/python3.10/site-packages
+# Сборка проекта
+RUN pnpm build
 
-# Возвращаемся к пользователю node (который используется в образе n8n)
-USER node
+# Создание и активация виртуального окружения Python
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Установка Python-зависимостей в виртуальное окружение
+RUN pip3 install -r requirements.txt
+
+# Настройка окружения
+ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
+ENV EXPRESS_TRUST_PROXY=true
+ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
+
+# Делаем n8n исполняемым
+RUN chmod +x packages/cli/bin/n8n
+
+# Запуск n8n
+CMD ["pnpm", "start"]
