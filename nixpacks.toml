@@ -1,0 +1,9 @@
+[phases.setup]
+nixPkgs = ["nodejs", "python39"]
+
+[phases.install]
+cmds = [
+  "npm install -g pnpm@10.2.1",
+  "pnpm install --ignore-scripts",
+  "pip3 install -r requirements.txt"
+]
