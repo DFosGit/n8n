@@ -1,11 +1,11 @@
 FROM railwayapp/nixpacks:latest
 
-# Устанавливаем Node.js и npm
+# Устанавливаем Node.js и npm (версия npm совместима с Node.js 18.x)
 RUN apt-get update && apt-get install -y \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
-    && npm install -g npm@latest \
+    && npm install -g npm@9.8.1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Python и необходимые зависимости
