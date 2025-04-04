@@ -3,13 +3,13 @@ FROM railwayapp/nixpacks:latest
 # Устанавливаем Node.js и npm
 RUN apt-get update && apt-get install -y \
     curl \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
-    && npm install -g npm@9.8.1 \
+    && npm install -g npm@latest \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем pnpm
-RUN npm install -g pnpm@8.15.1
+RUN npm install -g pnpm@10.2.1
 
 # Устанавливаем Python и необходимые зависимости
 RUN apt-get update && apt-get install -y \
