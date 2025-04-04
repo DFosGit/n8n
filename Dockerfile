@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
 # Устанавливаем pnpm
 RUN npm install -g pnpm@10.2.1
 
+# Устанавливаем lefthook
+RUN npm install -g @arkweid/lefthook
+
 # Устанавливаем Python и необходимые зависимости
 RUN apt-get update && apt-get install -y \
     python3.9 \
