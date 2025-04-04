@@ -18,6 +18,7 @@ RUN apt-get update && \
     libxshmfence1 \
     libglu1-mesa \
     sudo \
+    git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -26,11 +27,14 @@ RUN npm install -g pnpm@10.2.1
 
 WORKDIR /app
 
-# Сначала копируем все файлы проекта
+# Копируем все файлы проекта
 COPY . .
 
 # Установка node зависимостей
 RUN pnpm install --ignore-scripts
+
+# Сборка проекта
+RUN pnpm build
 
 # Создание и активация виртуального окружения Python
 RUN python3 -m venv /app/venv
@@ -44,5 +48,5 @@ ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
 ENV EXPRESS_TRUST_PROXY=true
 ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
 
-# Запуск n8n
-CMD ["pnpm", "start"]
+# Запуск n8n для монорепозитория
+CMD ["node", "packages/cli/bin/n8n"]
