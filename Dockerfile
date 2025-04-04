@@ -1,12 +1,15 @@
 FROM railwayapp/nixpacks:latest
 
-# Устанавливаем Node.js и npm (версия npm совместима с Node.js 18.x)
+# Устанавливаем Node.js и npm
 RUN apt-get update && apt-get install -y \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm@9.8.1 \
     && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем pnpm
+RUN npm install -g pnpm@8.15.1
 
 # Устанавливаем Python и необходимые зависимости
 RUN apt-get update && apt-get install -y \
@@ -28,9 +31,9 @@ RUN python3.9 -m pip install -r /app/requirements.txt
 # Копируем остальной код
 COPY . /app
 
-# Устанавливаем зависимости Node.js для n8n
+# Устанавливаем зависимости с помощью pnpm
 WORKDIR /app
-RUN npm install
+RUN pnpm install
 
 # Запускаем n8n
 CMD ["npm", "run", "start"]
