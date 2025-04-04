@@ -2,10 +2,11 @@ FROM n8nio/n8n:1.81.0
 
 USER root
 
-# Установка Python и python3-pip с помощью apk (для Alpine)
+# Установка Python, python3-pip и curl с помощью apk (для Alpine)
 RUN apk update && apk add --no-cache \
     python3 \
     py3-pip \
+    curl \
     && rm -rf /var/cache/apk/*
 
 # Установка yt-dlp
