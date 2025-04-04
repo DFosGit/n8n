@@ -1,6 +1,9 @@
 FROM n8nio/n8n:1.81.0
 
-# Проверяем базовый дистрибутив и устанавливаем Python соответственно
+# Переключаемся на пользователя root для установки пакетов
+USER root
+
+# Устанавливаем Python и pip
 RUN if command -v apt-get >/dev/null 2>&1; then \
         apt-get update && \
         apt-get install -y --no-install-recommends python3 python3-pip && \
@@ -23,3 +26,6 @@ RUN python3 -c "import site; import os; print(site.getsitepackages()[0])" > /tmp
 
 # Настройка PYTHONPATH для доступа к пакетам Python из n8n
 ENV PYTHONPATH=/usr/local/lib/python3.10/site-packages:/usr/lib/python3/dist-packages:/usr/lib/python3.10/site-packages
+
+# Возвращаемся к пользователю node (который используется в образе n8n)
+USER node
