@@ -25,16 +25,12 @@ RUN npm install -g pnpm@10.2.1
 
 WORKDIR /app
 
-# Копирование только package.json сначала для кэширования зависимостей
-COPY package.json pnpm-lock.yaml* ./
-COPY requirements.txt ./
+# Сначала копируем все файлы проекта, чтобы гарантировать наличие папки patches
+COPY . .
 
 # Установка зависимостей 
 RUN pnpm install --ignore-scripts
 RUN pip3 install -r requirements.txt
-
-# Копирование остальных файлов проекта
-COPY . .
 
 # Настройка окружения
 ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
