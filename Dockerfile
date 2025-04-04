@@ -40,15 +40,20 @@ ENV PATH="/app/venv/bin:$PATH"
 # Установка Python-зависимостей в виртуальное окружение
 RUN pip3 install -r requirements.txt
 
+# Отключаем скрипты prepare и preinstall
+RUN sed -i 's/"prepare": "node scripts\/prepare.mjs"/"prepare": "echo Skipping prepare script"/g' package.json && \
+    sed -i 's/"preinstall": "node scripts\/block-npm-install.js"/"preinstall": "echo Skipping preinstall script"/g' package.json
+
 # Установка нативных зависимостей с принудительной сборкой из исходников
 ENV npm_config_build_from_source=true
-RUN pnpm install --no-frozen-lockfile
+ENV npm_config_sqlite=/usr/bin
+RUN pnpm install --ignore-scripts
 
-# После установки всех зависимостей, компилируем sqlite3 отдельно
-RUN cd node_modules/sqlite3 && npm run install
+# Установка sqlite3 напрямую
+RUN npm install sqlite3 --build-from-source
 
 # Запуск только основного сервера n8n без сборки всего монорепозитория
-# Это позволит избежать проблем со сборкой некоторых пакетов
+# Используем скрипт build:backend только для cli пакета
 RUN cd packages/cli && pnpm build
 
 # Настройка окружения
@@ -59,5 +64,5 @@ ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
 # Делаем n8n исполняемым
 RUN chmod +x packages/cli/bin/n8n
 
-# Запуск n8n
+# Запуск n8n напрямую
 CMD ["node", "packages/cli/bin/n8n", "start"]
