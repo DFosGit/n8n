@@ -19,6 +19,9 @@ RUN apt-get update && \
     libglu1-mesa \
     sudo \
     git \
+    build-essential \
+    python3-dev \
+    libsqlite3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -30,11 +33,8 @@ WORKDIR /app
 # Копируем все файлы проекта
 COPY . .
 
-# Установка node зависимостей
+# Установка node зависимостей с игнорированием скриптов
 RUN pnpm install --ignore-scripts
-
-# Сборка проекта
-RUN pnpm build
 
 # Создание и активация виртуального окружения Python
 RUN python3 -m venv /app/venv
@@ -42,6 +42,10 @@ ENV PATH="/app/venv/bin:$PATH"
 
 # Установка Python-зависимостей в виртуальное окружение
 RUN pip3 install -r requirements.txt
+
+# Сборка проекта без сборки @n8n/n8n-nodes-langchain
+RUN pnpm build:backend --filter=!@n8n/n8n-nodes-langchain && \
+    pnpm build:frontend --filter=!@n8n/n8n-nodes-langchain
 
 # Настройка окружения
 ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
@@ -52,4 +56,4 @@ ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
 RUN chmod +x packages/cli/bin/n8n
 
 # Запуск n8n
-CMD ["pnpm", "start"]
+CMD ["node", "packages/cli/bin/n8n", "start"]
