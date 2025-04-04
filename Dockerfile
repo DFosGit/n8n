@@ -48,5 +48,8 @@ ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
 ENV EXPRESS_TRUST_PROXY=true
 ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
 
-# Запуск n8n для монорепозитория
-CMD ["node", "packages/cli/bin/n8n"]
+# Делаем n8n исполняемым
+RUN chmod +x packages/cli/bin/n8n
+
+# Запуск n8n
+CMD ["pnpm", "start"]
