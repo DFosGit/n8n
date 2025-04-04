@@ -3,8 +3,8 @@ FROM node:20-slim
 # Установка Python и других зависимостей
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    python3.9 \
-    python3.9-dev \
+    python3 \
+    python3-dev \
     python3-pip \
     python3-venv \
     build-essential \
@@ -24,7 +24,7 @@ COPY package.json pnpm-lock.yaml requirements.txt ./
 RUN pnpm install --ignore-scripts
 
 # Установка Python-зависимостей в виртуальное окружение
-RUN python3.9 -m venv /app/venv && \
+RUN python3 -m venv /app/venv && \
     /app/venv/bin/pip install --upgrade pip && \
     /app/venv/bin/pip install -r requirements.txt
 
