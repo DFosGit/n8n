@@ -5,6 +5,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
+    python3-venv \
     libnss3 \
     libatk1.0-0 \
     libatk-bridge2.0-0 \
@@ -25,16 +26,23 @@ RUN npm install -g pnpm@10.2.1
 
 WORKDIR /app
 
-# Сначала копируем все файлы проекта, чтобы гарантировать наличие папки patches
+# Сначала копируем все файлы проекта
 COPY . .
 
-# Установка зависимостей 
+# Установка node зависимостей
 RUN pnpm install --ignore-scripts
+
+# Создание и активация виртуального окружения Python
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Установка Python-зависимостей в виртуальное окружение
 RUN pip3 install -r requirements.txt
 
 # Настройка окружения
 ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
 ENV EXPRESS_TRUST_PROXY=true
+ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
 
-# Запуск n8n (подставьте вашу команду запуска, если она отличается)
+# Запуск n8n
 CMD ["pnpm", "start"]
