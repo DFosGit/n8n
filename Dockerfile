@@ -33,9 +33,6 @@ WORKDIR /app
 # Копируем все файлы проекта
 COPY . .
 
-# Установка node зависимостей с игнорированием скриптов
-RUN pnpm install --ignore-scripts
-
 # Создание и активация виртуального окружения Python
 RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
@@ -43,9 +40,16 @@ ENV PATH="/app/venv/bin:$PATH"
 # Установка Python-зависимостей в виртуальное окружение
 RUN pip3 install -r requirements.txt
 
-# Сборка проекта без сборки @n8n/n8n-nodes-langchain
-RUN pnpm build:backend --filter=!@n8n/n8n-nodes-langchain && \
-    pnpm build:frontend --filter=!@n8n/n8n-nodes-langchain
+# Установка нативных зависимостей с принудительной сборкой из исходников
+ENV npm_config_build_from_source=true
+RUN pnpm install --no-frozen-lockfile
+
+# После установки всех зависимостей, компилируем sqlite3 отдельно
+RUN cd node_modules/sqlite3 && npm run install
+
+# Запуск только основного сервера n8n без сборки всего монорепозитория
+# Это позволит избежать проблем со сборкой некоторых пакетов
+RUN cd packages/cli && pnpm build
 
 # Настройка окружения
 ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
