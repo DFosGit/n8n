@@ -3,8 +3,11 @@ services:
     build:
       context: .
       steps:
+        - name: Install Python
+          run: |
+            apt-get update && apt-get install -y python3 python3-pip
         - name: Install Python dependencies
           run: |
             if [ -f requirements.txt ]; then
-              pip install -r requirements.txt
+              pip3 install -r requirements.txt
             fi
