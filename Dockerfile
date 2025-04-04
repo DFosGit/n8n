@@ -3,21 +3,11 @@ FROM node:20-slim
 # Установка Python и других зависимостей
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    python3 \
+    python3.9 \
+    python3.9-dev \
     python3-pip \
     python3-venv \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libgbm1 \
-    libasound2 \
-    libpangocairo-1.0-0 \
-    libxss1 \
-    libgtk-3-0 \
-    libxshmfence1 \
-    libglu1-mesa \
-    sudo \
+    build-essential \
     git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -27,29 +17,26 @@ RUN npm install -g pnpm@10.2.1
 
 WORKDIR /app
 
-# Копируем все файлы проекта
-COPY . .
+# Копируем package.json, pnpm-lock.yaml и requirements.txt для кэширования зависимостей
+COPY package.json pnpm-lock.yaml requirements.txt ./
 
 # Установка node зависимостей
 RUN pnpm install --ignore-scripts
 
+# Установка Python-зависимостей в виртуальное окружение
+RUN python3.9 -m venv /app/venv && \
+    /app/venv/bin/pip install --upgrade pip && \
+    /app/venv/bin/pip install -r requirements.txt
+
+# Копируем остальной код
+COPY . .
+
 # Сборка проекта
 RUN pnpm build
 
-# Создание и активация виртуального окружения Python
-RUN python3 -m venv /app/venv
-ENV PATH="/app/venv/bin:$PATH"
-
-# Установка Python-зависимостей в виртуальное окружение
-RUN pip3 install -r requirements.txt
-
 # Настройка окружения
-ENV NIXPACKS_PATH=/app/node_modules/.bin:$PATH
+ENV PATH="/app/venv/bin:$PATH"
 ENV EXPRESS_TRUST_PROXY=true
-ENV PYTHONPATH="/app/venv/lib/python3.11/site-packages:$PYTHONPATH"
-
-# Делаем n8n исполняемым
-RUN chmod +x packages/cli/bin/n8n
 
 # Запуск n8n
 CMD ["pnpm", "start"]
