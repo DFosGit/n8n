@@ -10,8 +10,8 @@ RUN if command -v apt-get >/dev/null 2>&1; then \
         apk add --no-cache python3 py3-pip; \
     fi
 
-# Создаем requirements.txt с зависимостью
-RUN echo "youtube-transcript-api" > /tmp/requirements.txt
+# Копирование вашего существующего requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 
 # Установка Python-зависимостей
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
