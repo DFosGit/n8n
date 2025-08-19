@@ -105,7 +105,7 @@ onMounted(async () => {
 
 <template>
 	<div ref="messageContainer" class="chat-message" :class="classes">
-		<div v-if="$slots.beforeMessage" class="chat-message-actions">
+		<div v-if="!!$slots.beforeMessage" class="chat-message-actions">
 			<slot name="beforeMessage" v-bind="{ message }" />
 		</div>
 		<slot>
@@ -133,9 +133,9 @@ onMounted(async () => {
 	display: block;
 	position: relative;
 	max-width: fit-content;
-	font-size: var(--chat--message--font-size, 1rem);
-	padding: var(--chat--message--padding, var(--chat--spacing));
-	border-radius: var(--chat--message--border-radius, var(--chat--border-radius));
+	font-size: var(--chat--message--font-size);
+	padding: var(--chat--message--padding);
+	border-radius: var(--chat--message--border-radius);
 	scroll-margin: 3rem;
 
 	.chat-message-actions {
@@ -160,13 +160,13 @@ onMounted(async () => {
 	}
 
 	p {
-		line-height: var(--chat--message-line-height, 1.5);
+		line-height: var(--chat--message-line-height);
 		word-wrap: break-word;
 	}
 
 	// Default message gap is half of the spacing
 	+ .chat-message {
-		margin-top: var(--chat--message--margin-bottom, calc(var(--chat--spacing) * 1));
+		margin-top: var(--chat--message--margin-bottom);
 	}
 
 	// Spacing between messages from different senders is double the individual message gap
@@ -178,7 +178,7 @@ onMounted(async () => {
 	&.chat-message-from-bot {
 		&:not(.chat-message-transparent) {
 			background-color: var(--chat--message--bot--background);
-			border: var(--chat--message--bot--border, none);
+			border: var(--chat--message--bot--border);
 		}
 		color: var(--chat--message--bot--color);
 		border-bottom-left-radius: 0;
@@ -187,7 +187,7 @@ onMounted(async () => {
 	&.chat-message-from-user {
 		&:not(.chat-message-transparent) {
 			background-color: var(--chat--message--user--background);
-			border: var(--chat--message--user--border, none);
+			border: var(--chat--message--user--border);
 		}
 		color: var(--chat--message--user--color);
 		margin-left: auto;
@@ -197,6 +197,7 @@ onMounted(async () => {
 	> .chat-message-markdown {
 		display: block;
 		box-sizing: border-box;
+		font-size: inherit;
 
 		> *:first-child {
 			margin-top: 0;

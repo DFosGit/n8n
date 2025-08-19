@@ -1,17 +1,15 @@
 {
     "type": "object",
     "properties": {
-        "_name": {
-            "type": "string"
-        },
         "_id": {
             "type": "string"
         },
-        "_createTime": {
+        "_name": {
             "type": "string"
         },
         "_updateTime": {
             "type": "string"
         }
-    }
+    },
+    "version": 2
 }

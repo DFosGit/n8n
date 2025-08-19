@@ -1,14 +1,33 @@
 {
     "type": "object",
     "properties": {
-        "query": {
+        "companyUrl": {
             "type": "string"
         },
-        "timestamp": {
+        "connectionDegree": {
+            "type": "string"
+        },
+        "firstName": {
+            "type": "string"
+        },
+        "fullName": {
+            "type": "string"
+        },
+        "industry": {
+            "type": "string"
+        },
+        "lastName": {
+            "type": "string"
+        },
+        "location": {
             "type": "string"
         },
         "profileUrl": {
             "type": "string"
+        },
+        "timestamp": {
+            "type": "string"
         }
-    }
+    },
+    "version": 3
 }

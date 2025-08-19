@@ -8,7 +8,7 @@ import type {
 	INodeTypeDescription,
 	IPollFunctions,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
 import {
 	googleApiRequest,
@@ -33,7 +33,7 @@ export class GmailTrigger implements INodeType {
 		name: 'gmailTrigger',
 		icon: 'file:gmail.svg',
 		group: ['trigger'],
-		version: [1, 1.1, 1.2],
+		version: [1, 1.1, 1.2, 1.3],
 		description:
 			'Fetches emails from Gmail and starts the workflow on specified polling intervals.',
 		subtitle: '={{"Gmail Trigger"}}',
@@ -62,7 +62,7 @@ export class GmailTrigger implements INodeType {
 		],
 		polling: true,
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionTypes.Main],
 		properties: [
 			{
 				displayName: 'Authentication',
@@ -325,6 +325,10 @@ export class GmailTrigger implements INodeType {
 					if (fullMessage.labelIds?.includes('DRAFT')) {
 						continue;
 					}
+				}
+
+				if (node.typeVersion > 1.2 && fullMessage.labelIds?.includes('SENT')) {
+					continue;
 				}
 
 				if (!simple) {
